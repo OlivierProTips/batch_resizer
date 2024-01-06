@@ -3,4 +3,3 @@ darkdetect
 packaging
 pillow
 progress
-tk
