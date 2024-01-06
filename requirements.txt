@@ -1,2 +1,6 @@
-Pillow==8.1.2
-progress==1.5
+customtkinter
+darkdetect
+packaging
+pillow
+progress
+tk
