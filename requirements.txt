@@ -1,4 +1,4 @@
-customtkinter
+flet
 darkdetect
 packaging
 pillow

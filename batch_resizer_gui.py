@@ -16,7 +16,7 @@ def watch():
             # Update your progressbar to finished.
             bar.stop()
             bar.destroy()
-            proc = None
+            p = None
             message.configure(text="DONE", text_color='green')
             goButton.configure(state="normal")
         else:
