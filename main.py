@@ -1,15 +1,69 @@
 import flet as ft
-import batch_resizer as br
 from pathlib import Path
 
+from os import path, walk
+import sys
+from datetime import datetime
+from distutils.dir_util import copy_tree
+from PIL import Image
+
+from time import sleep
+
+
 def main(page: ft.Page):
+        
+    def printMessage(msg, color):
+        message.value = msg
+        message.color = color
+        page.update()
+
+    def copyImagesFolder(_src_folder: str, _dest_folder: str):
+        # Step 1: copy images folder
+        while _src_folder.endswith(path.sep):
+            _src_folder = _src_folder[:-1]
+        while _dest_folder.endswith(path.sep):
+            _dest_folder = _dest_folder[:-1]
+
+        _folder_name = path.basename(_src_folder)
+        _timestamp = datetime.now().strftime("%d%m%Y%H%M%S")
+        _dest_folder = path.join(_dest_folder, _folder_name + "_" + str(_timestamp))
+
+        if path.exists(_dest_folder):
+            printMessage("Destination folder already exists", "red")
+            return None
+        try:
+            copy_tree(_src_folder, _dest_folder)
+        except Exception as e:
+            printMessage("Photos cannot be copied into destination", "red")
+            return None
+    
+        return _dest_folder
+
+    def parseAndResize(_dest_folder: str, _percent: int):
+        # Step 2: Parse and resize images
+        fileCpt = 0
+        for root, _, files in walk(_dest_folder):
+            for name in files:
+                fileCpt += 1
+                bar.value = fileCpt / len(files)
+                page.update()
+                fullname = str(path.join(root, name))
+                try:
+                    image = Image.open(fullname)
+                    width, height = image.size
+                    image.thumbnail((width * _percent // 100, height * _percent // 100))
+                    image.save(fullname)
+                except:
+                    pass
+  
     def resizeProcess(src, dest, percent):
-        destFolder = br.copyImagesFolder(src, str(dest))
-        br.parseAndResize(destFolder, percent)
+        destFolder = copyImagesFolder(src, str(dest))
+        if destFolder:
+            parseAndResize(destFolder, percent)
 
     def openFolder(e: ft.FilePickerResultEvent):
         folderField.value = e.path
-        if not folderField.value:
+        if not saveField.value:
             saveField.value = Path(folderField.value).parent.absolute()
         page.update()
 
@@ -19,22 +73,15 @@ def main(page: ft.Page):
             
     def resize(e):
         if not folderField.value:
-            message.value = "PLEASE SELECT A FOLDER"
-            message.color = "RED"
-            page.update()
+            printMessage("PLEASE SELECT A FOLDER", "RED")
         else:
             goButton.disabled = True
             bar.visible = True
-            message.value = "IN PROGRESS"
-            message.color = "yellow"
-            page.update()
+            printMessage("IN PROGRESS", "yellow")
             resizeProcess(folderField.value, saveField.value, int(slider.value))
-            message.value = "DONE"
-            message.color = "green"
             goButton.disabled = False
             bar.visible = False
-            page.update()
-        
+            printMessage("DONE", "green")
 
     page.title = 'Batch Resizer'
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
