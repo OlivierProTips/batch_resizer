@@ -9,7 +9,12 @@ def main(page: ft.Page):
 
     def openFolder(e: ft.FilePickerResultEvent):
         folderField.value = e.path
-        print(slider.value)
+        if not folderField.value:
+            saveField.value = Path(folderField.value).parent.absolute()
+        page.update()
+
+    def saveFolder(e: ft.FilePickerResultEvent):
+        saveField.value = e.path
         page.update()
             
     def resize(e):
@@ -23,8 +28,7 @@ def main(page: ft.Page):
             message.value = "IN PROGRESS"
             message.color = "yellow"
             page.update()
-            parentFolder = Path(folderField.value).parent.absolute()
-            resizeProcess(folderField.value, parentFolder, int(slider.value))
+            resizeProcess(folderField.value, saveField.value, int(slider.value))
             message.value = "DONE"
             message.color = "green"
             goButton.disabled = False
@@ -35,16 +39,23 @@ def main(page: ft.Page):
     page.title = 'Batch Resizer'
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.window_width = 800
-    page.window_height = 300
+    page.window_height = 350
     page.window_resizable = False
     page.padding=20
     
     selectFolder = ft.FilePicker(on_result=openFolder)
+    selectSaveFolder = ft.FilePicker(on_result=saveFolder)
     page.overlay.append(selectFolder)
+    page.overlay.append(selectSaveFolder)
     
     folderField = ft.TextField(label="Select photos folder", disabled=True, value="", expand=True)
     folderButton = ft.IconButton(ft.icons.FOLDER, 
                                  on_click=lambda _: selectFolder.get_directory_path(initial_directory=str(Path.cwd().absolute())),
+                                 icon_color="blue")
+    
+    saveField = ft.TextField(label="Select destination folder", disabled=True, value="", expand=True)
+    saveButton = ft.IconButton(ft.icons.FOLDER, 
+                                 on_click=lambda _: selectSaveFolder.get_directory_path(initial_directory=str(Path.cwd().absolute())),
                                  icon_color="blue")
     
     sliderText = ft.Text(value="Select a size")
@@ -65,9 +76,17 @@ def main(page: ft.Page):
     page.add(
         ft.Row(
             [
-                # ft.Text(value="Select photos folder"),
                 folderField,
                 folderButton,
+            ],
+            alignment=ft.MainAxisAlignment.CENTER,
+        )
+    )
+    page.add(
+        ft.Row(
+            [
+                saveField,
+                saveButton,
             ],
             alignment=ft.MainAxisAlignment.CENTER,
         )
