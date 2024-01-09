@@ -83,7 +83,7 @@ def main(page: ft.Page):
     page.window_width = 800
     page.window_height = 350
     page.window_resizable = False
-    page.window_minimizable = False
+    page.window_maximizable = False
     page.padding=20
     
     selectFolder = ft.FilePicker(on_result=openFolder)
