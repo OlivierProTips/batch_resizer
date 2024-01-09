@@ -2,7 +2,7 @@ import flet as ft
 from pathlib import Path
 from os import path, walk
 from datetime import datetime
-from distutils.dir_util import copy_tree
+from shutil import copytree
 from PIL import Image
 
 def main(page: ft.Page):
@@ -27,7 +27,7 @@ def main(page: ft.Page):
             printMessage("Destination folder already exists", "red")
             return None
         try:
-            copy_tree(_src_folder, _dest_folder)
+            copytree(_src_folder, _dest_folder)
         except Exception as e:
             printMessage("Photos cannot be copied into destination", "red")
             return None
