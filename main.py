@@ -1,14 +1,9 @@
 import flet as ft
 from pathlib import Path
-
 from os import path, walk
-import sys
 from datetime import datetime
 from distutils.dir_util import copy_tree
 from PIL import Image
-
-from time import sleep
-
 
 def main(page: ft.Page):
         
