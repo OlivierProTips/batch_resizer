@@ -1,5 +1,2 @@
 flet
-darkdetect
-packaging
 pillow
-progress
